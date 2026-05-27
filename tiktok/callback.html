@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok OAuth Callback</title>
+<style>
+  body { background:#0b1220; color:#eaf2ff; font:1.1em sans-serif; padding:40px; text-align:center; }
+  .box { background:#111d33; border:1px solid #2a4a7f; border-radius:12px; padding:24px; max-width:600px; margin:40px auto; word-break:break-all; }
+  .code { background:#0a0f1a; color:#7fdbff; padding:12px; border-radius:8px; font-family:monospace; font-size:1.1em; }
+  .btn { background:#2a4a7f; color:#fff; border:none; padding:10px 24px; border-radius:8px; cursor:pointer; font-size:1em; }
+  .btn:hover { background:#3a5a9f; }
+  .error { color:#ff7f7f; }
+</style>
+</head>
+<body>
+<h2>TikTok OAuth Response</h2>
+<div class="box" id="content">Loading...</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+  
+  if (error) {
+    document.getElementById('content').innerHTML = `
+      <h3 class="error">Error: ${error}</h3>
+      <p>${params.get('error_description') || ''}</p>
+    `;
+  } else if (code) {
+    document.getElementById('content').innerHTML = `
+      <h3>Authorization Successful!</h3>
+      <p>Copy this code and paste in terminal:</p>
+      <div class="code" id="authCode">${code}</div>
+      <br>
+      <button class="btn" onclick="copyCode()">Copy Code</button>
+      <p style="color:#8899aa;font-size:0.9em;margin-top:16px">
+        State: ${state ? state.substring(0,20)+'...' : 'none'}
+      </p>
+    `;
+  } else {
+    document.getElementById('content').innerHTML = `
+      <p>Waiting for TikTok OAuth callback...</p>
+      <p class="error">No authorization code received.</p>
+    `;
+  }
+  
+  function copyCode() {
+    const codeEl = document.getElementById('authCode');
+    navigator.clipboard.writeText(codeEl.textContent).then(() => {
+      alert('Code copied!');
+    });
+  }
+</script>
+</body>
+</html>
